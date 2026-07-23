@@ -50,7 +50,11 @@ Fields are bold-labeled list items. All are optional:
     `retracted`, `sent`, or `superseded` (case-insensitive) moves the card
     to the **Shipped** column, wherever it sits in the file. Writing
     `SHIPPED` or `DONE` in the card's *title* does the same.
-  - A status starting with `blocked` marks the card blocked on its face.
+  - A status starting with `blocked` marks the card blocked on its face
+    (legacy spelling — prefer the `**Blocked:**` field).
+- `**Blocked:**` — the blocked flag. Present means blocked; the value is
+  the reason (`on: TASK-002 — shortcuts need somewhere to point`). The
+  board's block/unblock action writes and removes exactly this line.
 - `**Size:**` — rendered as a chip (`S`, `M`, `XL`, whatever you use).
 - `**Tags:**` — rendered as a chip. First token only; keep it short.
 
@@ -77,13 +81,21 @@ Ship the importer. Everything else waits.
 
 ## What Autobahn writes
 
-Two operations, both plain-text splices of whole card blocks:
+Four operations, all plain-text edits:
 
 - **Move** — the card's block (heading through the line before the next
   heading) is cut and inserted at its new position. Bytes are preserved.
 - **New card** — the next `PREFIX-N` id is minted (scanning the file for
   the highest existing number with your configured prefix) and a template
   card is appended to the lane.
+- **Ship** — dropping a card on the Shipped column rewrites its Status
+  line to `shipped (<date> via Autobahn)` (adding one if the card had
+  none). Shipped is derived from status, so the card's block stays where
+  it sits in the file.
+- **Block / unblock** — inserts, replaces, or removes the card's single
+  `- **Blocked:** reason` line (after Status when present). Unblocking a
+  legacy card whose Status line itself starts with `blocked` rewrites that
+  status to `open (unblocked <date> via Autobahn)`.
 
 Nothing else in the file is ever touched. Hand-edits and board edits
 coexist; the file re-parses on every request, so edits from your editor

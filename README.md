@@ -36,6 +36,44 @@ the card grammar — or copy `example/BACKLOG.md` as a starter). Every other
 
 Requires Node 18+. No install step, no dependencies.
 
+### Dynamic routes
+
+The route picks the board: any subdirectory with its own `BACKLOG.md` is
+served live at its path — `https://autobahn.localhost/my-project/` — no
+restart needed. Visiting a directory without a backlog lists the boards
+found beneath it, with a one-click way to start one. Each project
+directory may carry its own `autobahn.config.json`.
+
+## Portless
+
+[portless](https://www.npmjs.com/package/portless) gives dev servers
+stable, named `.localhost` URLs with no port numbers: it runs an HTTPS
+proxy on ports 80/443 and forwards by hostname. Autobahn honors the
+`$PORT` it injects, so the two compose with one command:
+
+```
+npm install -g portless
+portless proxy start                     # once (or: portless service install)
+portless autobahn node server.mjs ~/code # → https://autobahn.localhost
+```
+
+Handy variations:
+
+```
+portless autobahn node --watch server.mjs ~/code   # auto-restart on server edits
+portless alias autobahn 4780                       # static route to a fixed port
+portless list                                      # show active routes
+```
+
+Run `portless trust` once if the browser warns about the certificate.
+
+No portless? `--domain` (optionally `--domain=my.localhost`) binds port 80
+on loopback directly when it's free, for a plain-http portless URL:
+
+```
+node server.mjs ~/code --domain     # → http://autobahn.localhost
+```
+
 ## What it does
 
 - **Lanes** — `## Now`, `## Next`, `## Later` headings in the backlog open
@@ -51,7 +89,13 @@ Requires Node 18+. No install step, no dependencies.
 - **Pinned notes** — non-card `##` blocks inside the first lane render as
   pinned notes above the board (sprint goals, standing reminders).
 - **Docs tabs** — the rest of your project's markdown, rendered read-only.
-- **Dirty flag** — shows when the directory has uncommitted git changes.
+- **Live reload** — the server watches the board directory (OS file
+  events, no polling); edit the markdown in your editor and the open board
+  refreshes itself.
+- **Dirty flag** — shows when the board file (and only the board file) has
+  uncommitted changes. Click it to preview a generated commit subject
+  ("backlog: TASK-007 carded · TASK-003 → Now"), click again to commit —
+  just that file, never the rest of the repo.
 
 ## Configuration
 
@@ -63,7 +107,8 @@ Optional `autobahn.config.json` next to your backlog:
   "docs": ["PLAN.md", "NOTES.md"],
   "lanes": ["Now", "Next", "Later"],
   "prefix": "TASK",
-  "port": 4780
+  "port": 4780,
+  "domain": "autobahn.localhost"
 }
 ```
 

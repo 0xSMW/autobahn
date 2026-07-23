@@ -38,12 +38,14 @@ One goal: get the demo deployable. Everything else is a distraction until
   downloadable error report.
 - **Done means:** a 10k-row file imports cleanly; bad rows are explained.
 
-## TASK-004 · Keyboard shortcuts
-- **Status:** blocked (on: TASK-002 — shortcuts need somewhere to point)
-- **Size:** S
-- **Why:** power users live on the keyboard; parity is table stakes.
-
 ## Later
+
+## TASK-006 · Public API
+- **Status:** shipped 2026-07-01 — v1 with read endpoints and API keys
+- **Size:** XL
+- **Tags:** platform
+- **Why:** integrations are the retention story.
+- **Done means:** a third party builds something we didn't anticipate.
 
 ## TASK-005 · Dark mode
 - **Status:** open
@@ -52,9 +54,7 @@ One goal: get the demo deployable. Everything else is a distraction until
 - **Why:** requested often; also the default look of every screenshot that
   gets shared.
 
-## TASK-006 · Public API
-- **Status:** shipped 2026-07-01 — v1 with read endpoints and API keys
-- **Size:** XL
-- **Tags:** platform
-- **Why:** integrations are the retention story.
-- **Done means:** a third party builds something we didn't anticipate.
+## TASK-004 · Keyboard shortcuts
+- **Status:** blocked (on: TASK-002 — shortcuts need somewhere to point)
+- **Size:** S
+- **Why:** power users live on the keyboard; parity is table stakes.

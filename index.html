@@ -17,6 +17,8 @@
   header h1 { font-size: 30px; font-weight: 400; letter-spacing: -0.015em; }
   header .root { font-size: 13px; color: #3B3D3D; }
   header .dirty { font-size: 13px; color: #969A9C; }
+  header .dirty.hot { cursor: pointer; }
+  header .dirty.hot:hover { color: #DEDEDE; text-decoration: underline; text-underline-offset: 3px; }
   nav { display: flex; gap: 4px; flex-wrap: wrap; padding: 10px 0 22px; }
   nav button { font: 13.5px var(--sans); color: #969A9C; background: none; border: 0; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
   nav button:hover { color: #DEDEDE; }
@@ -30,6 +32,8 @@
   .pin code { font-family: var(--mono); font-size: 11.5px; background: #1a1b1b; border-radius: 4px; padding: 0 5px; }
   .pin a { color: #DEDEDE; }
 
+  .board-empty { font-size: 13px; color: #969A9C; margin: 2px 0 14px; }
+  .board-empty b { font-weight: 400; color: #DEDEDE; background: #1a1b1b; border-radius: 4px; padding: 1px 6px; font-family: var(--mono); font-size: 11.5px; }
   .lanes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; align-items: start; }
   @media (max-width: 980px) { .lanes { grid-template-columns: 1fr; } }
   .lane { background: #0A0B0B; min-height: 320px; padding: 14px; }
@@ -39,7 +43,7 @@
   .card { background: #111212; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; cursor: grab; }
   .card:active { cursor: grabbing; }
   .card:hover { background: #161717; }
-  .card.over-before { box-shadow: 0 -2px 0 0 #DEDEDE; }
+  .card.over-before { box-shadow: 0 -1px 0 0 rgba(255,255,255,0.25); }
   .card .id { display: inline-block; font-size: 11.5px; color: #969A9C; background: #1a1b1b; border-radius: 6px; padding: 1.5px 7px; margin-bottom: 7px; }
   .card .id.blocked { color: #DEDEDE; }
   .card .meta-chips { display: inline-flex; gap: 4px; margin-left: 4px; }
@@ -47,9 +51,18 @@
   .card h4 { font-size: 15.5px; font-weight: 400; line-height: 1.4; text-wrap: pretty; }
   .card .st { margin-top: 7px; font-size: 13px; color: #969A9C; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .card.done { opacity: 0.55; cursor: default; }
+  .card.focus { outline: 1.5px solid rgba(255,255,255,0.4); outline-offset: -1.5px; }
   .card.done h4 { color: #969A9C; }
-  .newcard { margin-left: auto; font: 13.5px var(--sans); color: #050505; background: #DEDEDE; border: 0; border-radius: 999px; padding: 7px 15px; cursor: pointer; }
+  .newcard { align-self: center; font: 13.5px var(--sans); color: #050505; background: #DEDEDE; border: 0; border-radius: 999px; padding: 7px 15px; cursor: pointer; }
   .newcard:hover { background: #fff; }
+  .keys-btn { margin-left: auto; align-self: center; width: 32px; height: 32px; border: 0; border-radius: 999px; background: #1a1b1b; color: #969A9C; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .keys-btn:hover { color: #DEDEDE; background: #1E2020; }
+  .keys-panel { max-width: 420px; }
+  .keys-panel h2 { font-size: 19px; font-weight: 400; color: #DEDEDE; margin-bottom: 2px; }
+  .keys-group { font-size: 12px; color: #3B3D3D; margin: 18px 0 4px; }
+  .key-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 5px 0; font-size: 14px; color: #C9CDCF; }
+  .key-row span:last-child { flex-shrink: 0; }
+  .key-row kbd { font: 11.5px var(--mono); color: #DEDEDE; background: #1a1b1b; border-radius: 5px; padding: 2.5px 7px; margin-left: 4px; }
 
   .doc { max-width: 920px; font-size: 15px; line-height: 1.65; color: #C9CDCF; }
   .doc h1 { font-size: 36px; font-weight: 400; letter-spacing: -0.015em; color: #DEDEDE; margin: 8px 0 14px; }
@@ -81,19 +94,67 @@
   .lb-close { position: absolute; top: 18px; right: 18px; width: 30px; height: 30px; border: 0; border-radius: 999px; background: #1a1b1b; color: #969A9C; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .lb-close:hover { color: #DEDEDE; }
   .lb-body { font-size: 14.5px; line-height: 1.6; color: #C9CDCF; }
+  .lb-chips { display: none; }
+  .lb-chips.has { display: flex; gap: 4px; margin: -8px 0 18px; }
+  .lb-chips .chip { font-size: 11px; color: #6f7375; background: #161717; border-radius: 6px; padding: 1.5px 7px; }
+  .lb-sec { margin: 0 0 16px; }
+  .lb-lab { font-size: 12px; color: #3B3D3D; margin-bottom: 2px; }
+  .lb-val { font-size: 14.5px; line-height: 1.6; color: #C9CDCF; text-wrap: pretty; }
+  .lb-val.tbd { color: #3B3D3D; }
+  #lb-block input { width: 100%; font: 14.5px/1.6 var(--sans); color: #C9CDCF; background: none; border: 0; outline: 0; padding: 2px 0; }
+  #lb-block input::placeholder { color: #3B3D3D; }
+  .lb-foot { display: flex; gap: 14px; margin-top: 22px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: #3B3D3D; }
+  .lb-foot button { font: 12px var(--sans); color: #969A9C; background: none; border: 0; padding: 0; cursor: pointer; }
+  .lb-foot button:hover { color: #DEDEDE; }
+
+  .comp { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 92vw; background: #111212; border-left: 1px solid rgba(255,255,255,0.08); padding: 22px 26px 24px; z-index: 150; overflow-y: auto; transform: translateX(105%); transition: transform 150ms ease; }
+  .comp.open { transform: translateX(0); }
+  .comp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .comp-head .id { font-size: 12px; color: #969A9C; background: #1a1b1b; border-radius: 6px; padding: 2px 8px; }
+  .comp-close { width: 30px; height: 30px; border: 0; border-radius: 999px; background: #1a1b1b; color: #969A9C; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .comp-close:hover { color: #DEDEDE; }
+  .comp-title { width: 100%; font: 19px/1.35 var(--sans); color: #DEDEDE; background: none; border: 0; outline: 0; padding: 0 0 16px; }
+  .comp-title::placeholder { color: #3B3D3D; }
+  .comp-lanes { margin-bottom: 22px; }
+  .comp-pills { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .pill { font: 13px var(--sans); color: #969A9C; background: #1a1b1b; border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+  .pill:hover { color: #DEDEDE; }
+  .pill.on { background: #DEDEDE; color: #050505; }
+  .comp .lb-sec input { width: 100%; font: 14.5px/1.6 var(--sans); color: #C9CDCF; background: none; border: 0; outline: 0; padding: 2px 0; }
+  .comp .lb-sec input::placeholder { color: #3B3D3D; }
+  .comp .tag-in { width: 90px; font: 13px var(--sans); color: #C9CDCF; background: none; border: 0; outline: 0; padding: 5px 0 5px 4px; }
+  .comp .tag-in::placeholder { color: #3B3D3D; }
+  .comp-foot { margin-top: 20px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11.5px; color: #3B3D3D; }
+  .comp-foot b, .pal-foot b { font-weight: 400; color: #969A9C; }
+
+  .pal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: none; align-items: flex-start; justify-content: center; padding: 14vh 24px 24px; z-index: 200; }
+  .pal-backdrop.open { display: flex; }
+  .pal-panel { background: #111212; border-radius: 14px; max-width: 560px; width: 100%; overflow: hidden; }
+  .pal-panel input { width: 100%; font: 15px var(--sans); color: #DEDEDE; background: none; border: 0; outline: 0; padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .pal-panel input::placeholder { color: #3B3D3D; }
+  .pal-list { max-height: 46vh; overflow-y: auto; padding: 6px; }
+  .pal-group { font-size: 11.5px; color: #3B3D3D; padding: 8px 12px 4px; }
+  .pal-item { display: flex; gap: 10px; align-items: baseline; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+  .pal-item.sel { background: #1E2020; }
+  .pal-item .id { font-size: 11.5px; color: #969A9C; background: #1a1b1b; border-radius: 6px; padding: 1.5px 7px; flex-shrink: 0; }
+  .pal-item .t { font-size: 14px; color: #DEDEDE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pal-item .h { margin-left: auto; font-size: 12px; color: #3B3D3D; flex-shrink: 0; }
+  .pal-foot { font-size: 11.5px; color: #3B3D3D; padding: 8px 16px 10px; border-top: 1px solid rgba(255,255,255,0.06); }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Autobahn</h1>
-    <span class="root" id="root"></span>
-    <span class="dirty" id="dirty"></span>
-    <button type="button" class="newcard" onclick="newCard()">New card</button>
+    <h1 id="root"></h1>
+    <!-- <span class="root">Autobahn</span> -->
+    <span class="dirty" id="dirty" onclick="dirtyClick()"></span>
+    <button type="button" class="keys-btn" onclick="openKeys()" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
+    </button>
+    <button type="button" class="newcard" onclick="openComp()">New card</button>
   </header>
   <nav id="tabs"></nav>
   <div id="view"></div>
-  <p class="hint" id="hint"></p>
 </div>
 <div class="lb-backdrop" id="lb" onclick="if (event.target === this) closeCard()">
   <div class="lb-panel">
@@ -102,30 +163,117 @@
     </button>
     <div class="lb-head"><span class="id" id="lb-id"></span><h2 id="lb-title"></h2></div>
     <div class="lb-lane" id="lb-lane"></div>
+    <div class="lb-chips" id="lb-chips"></div>
+    <div id="lb-block"></div>
     <div class="lb-body doc" id="lb-body"></div>
+    <div class="lb-foot" id="lb-foot"></div>
+  </div>
+</div>
+<div class="lb-backdrop" id="keys" onclick="if (event.target === this) closeKeys()">
+  <div class="lb-panel keys-panel">
+    <button type="button" class="lb-close" onclick="closeKeys()" aria-label="Close">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <h2>Keyboard</h2>
+    <div class="keys-group">Anywhere</div>
+    <div class="key-row"><span>Open the command palette</span><span><kbd>⌘K</kbd><kbd>/</kbd></span></div>
+    <div class="key-row"><span>Close card, composer, or dialog</span><span><kbd>esc</kbd></span></div>
+    <div class="keys-group">Board</div>
+    <div class="key-row"><span>Navigate cards</span><span><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd></span></div>
+    <div class="key-row"><span>Open focused card</span><span><kbd>return</kbd></span></div>
+    <div class="key-row"><span>Move focused card</span><span><kbd>shift</kbd><kbd>↑↓←→</kbd></span></div>
+    <div class="key-row"><span>Block / unblock card</span><span><kbd>b</kbd></span></div>
+    <div class="key-row"><span>New card</span><span><kbd>n</kbd></span></div>
+    <div class="key-row"><span>Keyboard shortcuts</span><span><kbd>?</kbd></span></div>
+    <div class="keys-group">Command palette</div>
+    <div class="key-row"><span>Move selection</span><span><kbd>↑</kbd><kbd>↓</kbd></span></div>
+    <div class="key-row"><span>Open selection</span><span><kbd>return</kbd></span></div>
+    <div class="key-row"><span>Copy card id</span><span><kbd>⌘return</kbd></span></div>
+    <div class="keys-group">New card</div>
+    <div class="key-row"><span>Create card</span><span><kbd>return</kbd></span></div>
+    <div class="key-row"><span>Create &amp; open card</span><span><kbd>⌘return</kbd></span></div>
+    <div class="key-row"><span>Add tag, from the tag field</span><span><kbd>return</kbd><kbd>,</kbd></span></div>
+  </div>
+</div>
+<div class="comp" id="comp">
+  <div class="comp-head">
+    <span class="id" id="comp-id"></span>
+    <button type="button" class="comp-close" onclick="closeComp()" aria-label="Close">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <input class="comp-title" id="comp-title" placeholder="What ships?" autocomplete="off" spellcheck="false" />
+  <div class="comp-pills comp-lanes" id="comp-lanes"></div>
+  <div class="lb-sec"><div class="lb-lab">Size</div><div class="comp-pills" id="comp-size"></div></div>
+  <div class="lb-sec"><div class="lb-lab">Tags</div>
+    <div class="comp-pills"><span id="comp-tags-pills" style="display: contents"></span><input class="tag-in" id="comp-tag-in" placeholder="add tag…" autocomplete="off" spellcheck="false" /></div>
+  </div>
+  <div class="lb-sec"><div class="lb-lab">Why</div><input id="comp-why" placeholder="tbd" autocomplete="off" spellcheck="false" /></div>
+  <div class="lb-sec"><div class="lb-lab">Spec</div><input id="comp-spec" placeholder="tbd" autocomplete="off" spellcheck="false" /></div>
+  <div class="lb-sec"><div class="lb-lab">Done means</div><input id="comp-done" placeholder="tbd" autocomplete="off" spellcheck="false" /></div>
+  <div class="comp-foot"><b>return</b> creates · <b>⌘return</b> creates &amp; opens · <b>esc</b> closes</div>
+</div>
+<div class="pal-backdrop" id="pal" onclick="if (event.target === this) closePal()">
+  <div class="pal-panel">
+    <input id="pal-input" placeholder="Jump to a card, board, or doc…" autocomplete="off" spellcheck="false" />
+    <div class="pal-list" id="pal-list"></div>
+    <div class="pal-foot"><b>↑↓</b> move · <b>return</b> open · <b>⌘return</b> copy id · <b>esc</b> close</div>
   </div>
 </div>
 <script>
-let state = null, tab = 'Board', LANES = []
+let state = null, tab = 'Board', LANES = [], hashDone = false
 
 async function load() {
-  state = await (await fetch('/api/board')).json()
+  state = await (await fetch('api/board')).json()
   LANES = [...state.lanes, 'Shipped']
   document.getElementById('root').textContent = state.root
-  document.getElementById('hint').textContent =
-    `Cards are the ## PREFIX-N blocks in ${state.backlog} (grammar: FORMAT.md). ` +
-    'Drag between lanes or onto a card to reorder — both rewrite the file. ' +
-    'New card mints the next number. Click a card for full detail. Commit as usual.'
+  document.title = state.root + ' · Autobahn'
   renderTabs()
-  render()
+  await render()
+  // #TASK-012 deep link: open that card's lightbox on first load.
+  if (!hashDone) {
+    hashDone = true
+    const id = decodeURIComponent(location.hash.slice(1))
+    if (id && state.items.some(i => i.id === id)) openCard(id)
+  }
 }
 
 function renderTabs() {
   const tabs = ['Board', state.backlog, ...state.docs]
   document.getElementById('tabs').innerHTML = tabs.map(t =>
     `<button class="${t === tab ? 'on' : ''}" onclick="setTab('${t}')">${deshout(t.replace('.md',''))}</button>`).join('')
-  document.getElementById('dirty').textContent = state.dirty ? 'uncommitted changes' : ''
+  dirtyArmed = false
+  const dEl = document.getElementById('dirty')
+  dEl.textContent = state.dirty ? 'uncommitted changes' : ''
+  dEl.classList.toggle('hot', !!state.dirty)
 }
+
+// Two-click commit: first click previews the generated message in place,
+// second click commits (the board file only). Esc or a click elsewhere disarms.
+let dirtyArmed = false
+async function dirtyClick() {
+  const el = document.getElementById('dirty')
+  if (!state.dirty || el.dataset.busy) return
+  if (!dirtyArmed) {
+    const d = await (await fetch('api/commit')).json()
+    if (d.error) return
+    dirtyArmed = true
+    el.textContent = `commit “${d.message}”?`
+    return
+  }
+  el.dataset.busy = '1'
+  const r = await fetch('api/commit', { method: 'POST' })
+  const d = await r.json()
+  delete el.dataset.busy
+  dirtyArmed = false
+  if (!r.ok) { el.textContent = 'commit failed: ' + (d.error || r.status); return }
+  el.textContent = 'committed ' + d.sha
+  el.classList.remove('hot')
+  setTimeout(load, 1400)
+}
+document.addEventListener('click', (e) => {
+  if (dirtyArmed && e.target.id !== 'dirty') { dirtyArmed = false; renderTabs() }
+})
 function setTab(t) { tab = t; renderTabs(); render() }
 
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;') }
@@ -212,7 +360,7 @@ function md(src) {
 async function render() {
   const view = document.getElementById('view')
   if (tab !== 'Board') {
-    const src = await (await fetch('/api/doc?name=' + encodeURIComponent(tab))).text()
+    const src = await (await fetch('api/doc?name=' + encodeURIComponent(tab))).text()
     view.innerHTML = '<div class="doc">' + md(src) + '</div>'
     return
   }
@@ -224,12 +372,17 @@ async function render() {
       <div class="card ${i.done ? 'done' : ''}" draggable="${!i.done}" data-id="${i.id}" onclick="openCard('${i.id}')" style="cursor: pointer">
         <span class="id ${i.blocked ? 'blocked' : ''}">${i.id}${i.blocked ? ' · Blocked' : ''}</span><span class="meta-chips">${chipVal(i.size) ? `<span class="chip">${esc(chipVal(i.size))}</span>` : ''}${chipVal(i.tags) ? `<span class="chip">${esc(chipVal(i.tags))}</span>` : ''}</span>
         <h4>${esc(deshout(i.title))}</h4>
-        ${i.status ? `<div class="st">${esc(deshout(i.status))}</div>` : ''}
+        ${(i.blockedWhy || i.status) ? `<div class="st">${esc(deshout(i.blockedWhy ? 'blocked — ' + i.blockedWhy : i.status))}</div>` : ''}
       </div>`).join('')
-    return `<div class="lane" data-lane="${lane}"><h2>${lane} <span class="n">${items.length}</span></h2>${cards}</div>`
+    return `<div class="lane" data-lane="${lane}"><h2>${lane} ${items.length ? `<span class="n">${items.length}</span>` : ''}</h2>${cards}</div>`
   }).join('')
-  view.innerHTML = (pins ? `<div class="pins">${pins}</div>` : '') + `<div class="lanes">${lanes}</div>`
+  // Empty-board hint — disabled for now:
+  // const empty = !state.items.length && !state.pinned.length
+  //   ? '<p class="board-empty">No cards yet. Press <b>n</b> — or hit New card — to card the first task.</p>' : ''
+  const empty = ''
+  view.innerHTML = (pins ? `<div class="pins">${pins}</div>` : '') + empty + `<div class="lanes">${lanes}</div>`
   wireDnd()
+  if (focusId) setFocus(focusId) // re-render drops classes; restore the ring
 }
 
 // Chip values: first token (drop parentheticals), hidden when tbd/none.
@@ -240,30 +393,361 @@ function chipVal(v) {
   return t.length > 18 ? t.slice(0, 17) + '…' : t
 }
 
-async function newCard() {
-  const lane = state.lanes[1] || state.lanes[0]
-  const title = prompt(`New card title (goes to ${lane}):`)
-  if (!title || !title.trim()) return
-  const r = await fetch('/api/new', { method: 'POST', body: JSON.stringify({ title: title.trim(), lane }) })
+// --- New-card composer: the detail view, in editable form ---
+let compOpen = false, compLane = null, compSize = null, compTags = new Set(), compTagList = []
+
+// Preview the id the server will mint (server stays the authority).
+function nextId() {
+  const pre = (state.prefix || 'TASK') + '-'
+  let max = 0
+  state.items.forEach(i => { if (i.id.startsWith(pre)) max = Math.max(max, Number(i.id.slice(pre.length))) })
+  return pre + String(max + 1).padStart(3, '0')
+}
+// Every tag already used on the board, offered as toggle pills.
+function allTags() {
+  const s = new Set()
+  state.items.forEach(i => (i.tags || '').split(/[,;]/).forEach(t => {
+    t = t.trim()
+    if (t && !/^(tbd|none|n\/a)$/i.test(t)) s.add(t)
+  }))
+  return s
+}
+function openComp(lane) {
+  closeCard(); closePal(); closeKeys()
+  compOpen = true
+  compLane = lane && state.lanes.includes(lane) ? lane : (state.lanes[1] || state.lanes[0])
+  compSize = null
+  compTags = new Set()
+  document.getElementById('comp-id').textContent = nextId()
+  ;['comp-title', 'comp-tag-in', 'comp-why', 'comp-spec', 'comp-done'].forEach(id => { document.getElementById(id).value = '' })
+  compPaint()
+  document.getElementById('comp').classList.add('open')
+  setTimeout(() => document.getElementById('comp-title').focus(), 160)
+}
+function closeComp() { compOpen = false; document.getElementById('comp').classList.remove('open') }
+function compPaint() {
+  document.getElementById('comp-lanes').innerHTML = state.lanes.map(l =>
+    `<button type="button" class="pill ${l === compLane ? 'on' : ''}" onclick="compLane = '${l}'; compPaint()">${l}</button>`).join('')
+  document.getElementById('comp-size').innerHTML = ['S', 'M', 'L', 'XL'].map(s =>
+    `<button type="button" class="pill ${s === compSize ? 'on' : ''}" onclick="compSize = compSize === '${s}' ? null : '${s}'; compPaint()">${s}</button>`).join('')
+  compTagList = [...new Set([...allTags(), ...compTags])].sort()
+  document.getElementById('comp-tags-pills').innerHTML = compTagList.map((t, k) =>
+    `<button type="button" class="pill ${compTags.has(t) ? 'on' : ''}" onclick="toggleTag(${k})">${esc(t)}</button>`).join('')
+}
+function toggleTag(k) {
+  const t = compTagList[k]
+  compTags.has(t) ? compTags.delete(t) : compTags.add(t)
+  compPaint()
+}
+function commitTag() {
+  const inp = document.getElementById('comp-tag-in')
+  const t = inp.value.replace(/,/g, '').trim()
+  if (t) { compTags.add(t); inp.value = ''; compPaint() }
+  return !!t
+}
+async function compCreate(andOpen) {
+  const title = document.getElementById('comp-title').value.trim()
+  if (!title) { document.getElementById('comp-title').focus(); return }
+  commitTag() // a tag still sitting in the input counts
+  const v = (id) => document.getElementById(id).value.trim() || null
+  const r = await fetch('api/new', { method: 'POST', body: JSON.stringify({
+    title, lane: compLane, size: compSize, tags: [...compTags].join(', ') || null,
+    why: v('comp-why'), spec: v('comp-spec'), done: v('comp-done'),
+  }) })
   const d = await r.json()
   if (!r.ok) { alert('failed: ' + (d.error || r.status)); return }
+  closeComp()
   await load()
-  openCard(d.id)
+  if (andOpen) openCard(d.id)
 }
+// Return in the tag input commits the tag; return while it's empty falls
+// through to the global handler and creates the card.
+document.getElementById('comp-tag-in').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ',') && commitTag()) { e.preventDefault(); e.stopPropagation() }
+})
+
+// The leading run of `- **Field:** value` bullets is structured data, not
+// prose — pull it out so the lightbox can lay each field out properly.
+// Hard-wrapped values absorb their continuation lines; everything after the
+// field block stays markdown.
+function parseFields(body) {
+  const lines = body.split('\n')
+  const fields = []
+  let i = 0
+  while (i < lines.length) {
+    if (lines[i].trim() === '' && fields.length) { i++; continue }
+    const m = lines[i].match(/^\s*[-*] \*\*([^:*]+):\*\*\s*(.*)$/)
+    if (!m) break
+    let val = m[2]
+    i++
+    while (i < lines.length && lines[i].trim() && !/^\s*[-*] |^#{1,4} |^```|^> |^\|/.test(lines[i])) { val += ' ' + lines[i].trim(); i++ }
+    fields.push([m[1].trim(), val.replace(/\*/g, '').trim()])
+  }
+  return { fields, rest: lines.slice(i).join('\n') }
+}
+
+const TBD_RE = /^(tbd|none|n\/a|—|-)?$/i
+// Status, Size, and Tags render in the header, Blocked in its own
+// interactive section; everything else is a generic section.
+const HEADER_FIELDS = new Set(['status', 'size', 'tags', 'blocked'])
 
 let dragged = false
 function openCard(id) {
   if (dragged) { dragged = false; return }
   const item = state.items.find(i => i.id === id)
   if (!item) return
+  const { fields, rest } = parseFields(item.body || '')
+  const get = (k) => fields.find(([n]) => n.toLowerCase() === k)?.[1] ?? null
   document.getElementById('lb-id').textContent = item.id
   document.getElementById('lb-title').innerHTML = inline(deshout(item.title))
-  document.getElementById('lb-lane').textContent = (item.done ? 'Shipped · filed in ' : '') + item.lane
-  document.getElementById('lb-body').innerHTML = md(item.body || '')
+  const status = get('status') ?? item.status
+  document.getElementById('lb-lane').textContent =
+    (item.done ? 'Shipped · filed in ' : '') + item.lane + (status ? ' · ' + deshout(status) : '')
+  const chips = [get('size'), get('tags')].filter(v => v && !TBD_RE.test(v))
+  const chipsEl = document.getElementById('lb-chips')
+  chipsEl.innerHTML = chips.map(c => `<span class="chip">${esc(c)}</span>`).join('')
+  chipsEl.classList.toggle('has', chips.length > 0)
+  lbBlockReason = get('blocked') ?? (item.blocked && /^blocked/i.test(item.status ?? '')
+    ? (item.status.replace(/^blocked[\s:—–-]*/i, '').trim() || 'blocked') : null)
+  renderBlock(item.id)
+  const secs = fields.filter(([n]) => !HEADER_FIELDS.has(n.toLowerCase())).map(([n, v]) =>
+    `<div class="lb-sec"><div class="lb-lab">${esc(deshout(n))}</div>` +
+    `<div class="lb-val${TBD_RE.test(v) ? ' tbd' : ''}">${TBD_RE.test(v) ? esc(v || 'tbd') : inline(deshout(v))}</div></div>`).join('')
+  document.getElementById('lb-body').innerHTML = secs + (rest.trim() ? md(rest) : '')
+  document.getElementById('lb-foot').innerHTML =
+    `<span>${esc(state.backlog)}:${item.line}</span>` +
+    `<button onclick="copyTxt(this, '${item.id}')">copy id</button>` +
+    `<button onclick="copyTxt(this, location.origin + location.pathname + '#${item.id}')">copy link</button>` +
+    (item.done ? '' : item.blocked
+      ? `<button onclick="setBlock('${item.id}', null)">unblock</button>`
+      : `<button onclick="armBlock('${item.id}')">block…</button>`) +
+    (item.done ? '' : `<button onclick="shipCard('${item.id}')">ship</button>`)
   document.getElementById('lb').classList.add('open')
+  history.replaceState(null, '', '#' + item.id)
 }
-function closeCard() { document.getElementById('lb').classList.remove('open') }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCard() })
+
+// --- Blocked flag: shown as its own section, edited in place ---
+let blockArm = false, lbBlockReason = null
+function renderBlock(id) {
+  const el = document.getElementById('lb-block')
+  if (blockArm) {
+    el.innerHTML = `<div class="lb-sec"><div class="lb-lab">Blocked</div>` +
+      `<input id="block-in" placeholder="on: ${state.prefix || 'TASK'}-00X — why it waits" autocomplete="off" spellcheck="false" /></div>`
+    const inp = document.getElementById('block-in')
+    inp.value = lbBlockReason || ''
+    inp.addEventListener('keydown', (ev) => {
+      ev.stopPropagation()
+      if (ev.key === 'Escape') { blockArm = false; renderBlock(id) }
+      else if (ev.key === 'Enter') setBlock(id, inp.value.trim() || 'blocked')
+    })
+    setTimeout(() => inp.focus(), 0)
+  } else if (lbBlockReason != null) {
+    el.innerHTML = `<div class="lb-sec"><div class="lb-lab">Blocked</div><div class="lb-val">${inline(deshout(lbBlockReason))}</div></div>`
+  } else el.innerHTML = ''
+}
+function armBlock(id) { blockArm = true; openCard(id) }
+async function shipCard(id) {
+  const r = await fetch('api/ship', { method: 'POST', body: JSON.stringify({ id }) })
+  if (!r.ok) { alert('failed: ' + (await r.json()).error); return }
+  await load()
+  openCard(id)
+}
+async function setBlock(id, reason) { // a reason blocks, null unblocks
+  const r = await fetch('api/block', { method: 'POST', body: JSON.stringify({ id, reason }) })
+  if (!r.ok) { alert('failed: ' + (await r.json()).error); return }
+  blockArm = false
+  await load()
+  openCard(id)
+}
+
+function copyTxt(btn, txt) {
+  navigator.clipboard?.writeText(txt)
+  const was = btn.textContent
+  btn.textContent = 'copied'
+  setTimeout(() => { btn.textContent = was }, 900)
+}
+function closeCard() {
+  blockArm = false
+  document.getElementById('lb').classList.remove('open')
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search)
+}
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); palOpen ? closePal() : openPal(); return }
+  if (palOpen) {
+    if (e.key === 'Escape') closePal()
+    else if (e.key === 'ArrowDown') { e.preventDefault(); palMove(1) }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); palMove(-1) }
+    else if (e.key === 'Enter') { e.preventDefault(); palGo(e.metaKey || e.ctrlKey) }
+    return
+  }
+  if (compOpen) {
+    if (e.key === 'Escape') closeComp()
+    else if (e.key === 'Enter') { e.preventDefault(); compCreate(e.metaKey || e.ctrlKey) }
+    return
+  }
+  if (keysOpen) { if (e.key === 'Escape' || e.key === '?') closeKeys(); return }
+  const lbOpen = document.getElementById('lb').classList.contains('open')
+  if (e.key === 'Escape') {
+    if (dirtyArmed) { dirtyArmed = false; renderTabs() }
+    else lbOpen ? closeCard() : setFocus(null)
+    return
+  }
+  if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return
+  if (e.metaKey || e.ctrlKey || e.altKey) return
+  if (e.key === 'n') { e.preventDefault(); openComp(); return }
+  if (e.key === '/') { e.preventDefault(); openPal(); return }
+  if (e.key === '?') { e.preventDefault(); openKeys(); return }
+  if (e.key === 'b') { // toggles the lightbox card, else the focused card
+    const id = lbOpen ? document.getElementById('lb-id').textContent : focusId
+    const it = id && state.items.find(i => i.id === id)
+    if (it && !it.done) { e.preventDefault(); it.blocked ? setBlock(it.id, null) : armBlock(it.id) }
+    return
+  }
+  if (lbOpen || tab !== 'Board') return
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+    e.preventDefault()
+    e.shiftKey ? moveFocused(e.key) : navFocus(e.key)
+  } else if (e.key === 'Enter' && focusId) { e.preventDefault(); openCard(focusId) }
+})
+
+let keysOpen = false
+function openKeys() { keysOpen = true; document.getElementById('keys').classList.add('open') }
+function closeKeys() { keysOpen = false; document.getElementById('keys').classList.remove('open') }
+
+// --- Board keyboard navigation: arrows move a focus ring, return opens,
+// shift+arrows move the card itself (writes through api/move). ---
+let focusId = null
+const laneItems = (lane) => state.items.filter(i => lane === 'Shipped' ? i.done : (i.lane === lane && !i.done))
+function focusPos() {
+  for (let l = 0; l < LANES.length; l++) {
+    const idx = laneItems(LANES[l]).findIndex(i => i.id === focusId)
+    if (idx !== -1) return { l, idx }
+  }
+  return null
+}
+function setFocus(id) {
+  focusId = id
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('focus', c.dataset.id === focusId))
+  if (id) document.querySelector(`.card[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest' })
+}
+function navFocus(key) {
+  const pos = focusPos()
+  if (!pos) { // nothing focused yet: start at the first card on the board
+    for (const lane of LANES) { const it = laneItems(lane); if (it.length) return setFocus(it[0].id) }
+    return
+  }
+  if (key === 'ArrowUp' || key === 'ArrowDown') {
+    const it = laneItems(LANES[pos.l])
+    const idx = Math.max(0, Math.min(it.length - 1, pos.idx + (key === 'ArrowDown' ? 1 : -1)))
+    setFocus(it[idx].id)
+  } else {
+    const dir = key === 'ArrowRight' ? 1 : -1
+    for (let l = pos.l + dir; l >= 0 && l < LANES.length; l += dir) {
+      const it = laneItems(LANES[l])
+      if (it.length) return setFocus(it[Math.min(pos.idx, it.length - 1)].id)
+    }
+  }
+}
+async function moveFocused(key) {
+  const pos = focusPos()
+  const item = state.items.find(i => i.id === focusId)
+  if (!pos || !item || item.done) return // Shipped is derived — no moves
+  let payload = null
+  if (key === 'ArrowLeft' || key === 'ArrowRight') {
+    const l = pos.l + (key === 'ArrowRight' ? 1 : -1)
+    if (l < 0 || l >= state.lanes.length) return
+    payload = { id: focusId, toLane: state.lanes[l] }
+  } else {
+    const it = laneItems(LANES[pos.l])
+    if (key === 'ArrowUp') {
+      if (pos.idx === 0) return
+      payload = { id: focusId, toLane: LANES[pos.l], beforeId: it[pos.idx - 1].id }
+    } else {
+      if (pos.idx >= it.length - 1) return
+      const after = it[pos.idx + 2] // insert before the card two below = one step down
+      payload = { id: focusId, toLane: LANES[pos.l], ...(after ? { beforeId: after.id } : {}) }
+    }
+  }
+  const r = await fetch('api/move', { method: 'POST', body: JSON.stringify(payload) })
+  if (!r.ok) { alert('move failed: ' + (await r.json()).error); return }
+  await load()
+  setFocus(focusId)
+}
+
+// --- Command palette (cmd/ctrl-K) ---
+let palOpen = false, palSel = 0, palItems = [], boardsCache = null
+
+function palData(q) {
+  const tokens = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  const hit = (s) => { s = s.toLowerCase(); return tokens.every(t => s.includes(t)) }
+  const here = decodeURIComponent(location.pathname).replace(/^\/+|\/+$/g, '')
+  const cards = state.items
+    .filter(i => !tokens.length || hit(i.id + ' ' + i.title + ' ' + (i.status || '')))
+    .slice(0, tokens.length ? 10 : 6)
+    .map(i => ({ id: i.id, label: deshout(i.title), hint: i.done ? 'Shipped' : (i.lane || ''), copy: i.id,
+      run: () => { closePal(); openCard(i.id) } }))
+  const boards = (boardsCache?.boards || [])
+    .filter(b => b !== here)
+    .map(b => ({ label: b || boardsCache.base || 'root', hint: 'board',
+      run: () => { location.href = '/' + b.split('/').filter(Boolean).map(encodeURIComponent).join('/') + (b ? '/' : '') } }))
+    .filter(b => !tokens.length || hit(b.label)).slice(0, 8)
+  const docs = [state.backlog, ...state.docs]
+    .map(d => ({ label: deshout(d.replace('.md', '')), hint: 'doc', run: () => { closePal(); setTab(d) } }))
+    .filter(d => !tokens.length || hit(d.label)).slice(0, 8)
+  const actions = [
+    { label: 'New card…', hint: 'action', run: () => { closePal(); openComp() } },
+    { label: 'Board', hint: 'view', run: () => { closePal(); setTab('Board') } },
+  ].filter(a => !tokens.length || hit(a.label))
+  const groups = tokens.length
+    ? [['Cards', cards], ['Boards', boards], ['Docs', docs], ['Actions', actions]]
+    : [['Actions', actions], ['Boards', boards], ['Docs', docs], ['Cards', cards]]
+  return groups.filter(([, items]) => items.length)
+}
+
+function renderPal(q) {
+  const groups = palData(q)
+  palItems = groups.flatMap(([, items]) => items)
+  palSel = Math.min(palSel, Math.max(0, palItems.length - 1))
+  let n = 0
+  document.getElementById('pal-list').innerHTML = groups.map(([name, items]) =>
+    `<div class="pal-group">${name}</div>` + items.map(it => {
+      const k = n++
+      return `<div class="pal-item ${k === palSel ? 'sel' : ''}" data-k="${k}" onmouseenter="palSel=${k};palPaint()" onclick="palItems[${k}].run()">` +
+        `${it.id ? `<span class="id">${it.id}</span>` : ''}<span class="t">${esc(it.label)}</span><span class="h">${esc(it.hint)}</span></div>`
+    }).join('')).join('') || '<div class="pal-group">No matches</div>'
+}
+function palPaint() {
+  document.querySelectorAll('.pal-item').forEach(el => el.classList.toggle('sel', Number(el.dataset.k) === palSel))
+}
+function palMove(d) {
+  if (!palItems.length) return
+  palSel = (palSel + d + palItems.length) % palItems.length
+  palPaint()
+  document.querySelector(`.pal-item[data-k="${palSel}"]`)?.scrollIntoView({ block: 'nearest' })
+}
+function palGo(withMeta) {
+  const it = palItems[palSel]
+  if (!it) return
+  if (withMeta && it.copy) { navigator.clipboard?.writeText(it.copy); closePal(); return }
+  it.run()
+}
+async function openPal() {
+  palOpen = true
+  palSel = 0
+  closeCard(); closeKeys()
+  document.getElementById('pal').classList.add('open')
+  const inp = document.getElementById('pal-input')
+  inp.value = ''
+  renderPal('')
+  inp.focus()
+  if (!boardsCache) { // lazy: one fetch per page load, refreshed on navigation
+    try { boardsCache = await (await fetch('api/boards')).json() } catch { boardsCache = { boards: [] } }
+    if (palOpen) renderPal(inp.value)
+  }
+}
+function closePal() { palOpen = false; document.getElementById('pal').classList.remove('open') }
+document.getElementById('pal-input').addEventListener('input', e => { palSel = 0; renderPal(e.target.value) })
 
 function wireDnd() {
   document.querySelectorAll('.card[draggable="true"]').forEach(c => {
@@ -281,26 +765,34 @@ function wireDnd() {
       e.preventDefault(); e.stopPropagation(); c.classList.remove('over-before')
       const id = e.dataTransfer.getData('text/plain')
       if (id === c.dataset.id) return
-      const r = await fetch('/api/move', { method: 'POST', body: JSON.stringify({ id, toLane: lane, beforeId: c.dataset.id }) })
+      const r = await fetch('api/move', { method: 'POST', body: JSON.stringify({ id, toLane: lane, beforeId: c.dataset.id }) })
       if (!r.ok) alert('move failed: ' + (await r.json()).error)
       load()
     })
   })
   document.querySelectorAll('.lane').forEach(l => {
     const lane = l.dataset.lane
-    if (lane === 'Shipped') return
+    // Double-click a column's empty space to compose a card into that lane.
+    if (lane !== 'Shipped') l.addEventListener('dblclick', e => { if (!e.target.closest('.card')) openComp(lane) })
     l.addEventListener('dragover', e => { e.preventDefault(); l.classList.add('over') })
     l.addEventListener('dragleave', () => l.classList.remove('over'))
     l.addEventListener('drop', async e => {
       e.preventDefault(); l.classList.remove('over')
       const id = e.dataTransfer.getData('text/plain')
-      const r = await fetch('/api/move', { method: 'POST', body: JSON.stringify({ id, toLane: lane }) })
+      // Dropping on Shipped rewrites the card's Status line; Shipped is
+      // derived, so there is no block move.
+      const r = lane === 'Shipped'
+        ? await fetch('api/ship', { method: 'POST', body: JSON.stringify({ id }) })
+        : await fetch('api/move', { method: 'POST', body: JSON.stringify({ id, toLane: lane }) })
       if (!r.ok) alert('move failed: ' + (await r.json()).error)
       load()
     })
   })
 }
 load()
+// Live reload: the server watches the board directory via OS file events
+// (no polling) and pings here when a .md or the config changes.
+new EventSource('api/events').onmessage = () => load()
 </script>
 </body>
 </html>
