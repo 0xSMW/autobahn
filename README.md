@@ -1,6 +1,6 @@
 # Autobahn
 
-<img width="1164" height="642" alt="image" src="https://github.com/user-attachments/assets/608d4caa-983f-4b73-9511-f7394865ac79" />
+<img width="1350" height="898" alt="image" src="https://github.com/user-attachments/assets/385baaf1-7890-44ac-8745-f2da76b28dbf" />
 
 A kanban board that lives in your markdown. Zero dependencies, one file of
 server, one file of UI. Your `BACKLOG.md` stays the single source of truth.
