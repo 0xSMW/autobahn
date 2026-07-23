@@ -18,23 +18,33 @@ backlog loses nothing.
 
 ## Quickstart
 
-```
-git clone https://github.com/rams-design/autobahn
-cd autobahn
-node server.mjs example     # → http://localhost:4780
-```
-
-Then point it at your own project:
+One command sets Autobahn up as a resident service — every repo under
+your code root gets a board at a stable, portless HTTPS URL:
 
 ```
-node server.mjs ~/code/my-project
+npx github:0xSMW/autobahn setup ~/code   # → https://autobahn.localhost
 ```
 
-It looks for `BACKLOG.md` in that directory (see [FORMAT.md](FORMAT.md) for
-the card grammar — or copy `example/BACKLOG.md` as a starter). Every other
-`.md` file in the directory shows up as a read-only rendered tab.
+Setup clones the app to `~/.autobahn`, installs
+[portless](https://www.npmjs.com/package/portless) (a local HTTPS proxy
+that gives dev servers named `.localhost` URLs), and — on macOS —
+registers a LaunchAgent so the board is always on. Re-run it any time to
+update. Run `portless trust` once if the browser warns about the
+certificate.
 
-Requires Node 18+. No install step, no dependencies.
+Just trying it out? Serve one directory, install nothing:
+
+```
+npx github:0xSMW/autobahn ~/code/my-project   # → http://localhost:4780
+```
+
+Autobahn looks for `BACKLOG.md` in each directory (see
+[FORMAT.md](FORMAT.md) for the card grammar — or copy
+`example/BACKLOG.md` as a starter). Every other `.md` file in a board's
+directory shows up as a read-only rendered tab.
+
+Requires Node 18+. The server itself has zero dependencies; portless is
+the one optional global that setup adds.
 
 ### Dynamic routes
 
@@ -46,26 +56,14 @@ directory may carry its own `autobahn.config.json`.
 
 ## Portless
 
-[portless](https://www.npmjs.com/package/portless) gives dev servers
-stable, named `.localhost` URLs with no port numbers: it runs an HTTPS
-proxy on ports 80/443 and forwards by hostname. Autobahn honors the
-`$PORT` it injects, so the two compose with one command:
+Setup runs Autobahn through portless, which owns ports 80/443 and routes
+by hostname; the server honors the `$PORT` it injects. Useful commands:
 
 ```
-npm install -g portless
-portless proxy start                     # once (or: portless service install)
-portless autobahn node server.mjs ~/code # → https://autobahn.localhost
-```
-
-Handy variations:
-
-```
-portless autobahn node --watch server.mjs ~/code   # auto-restart on server edits
-portless alias autobahn 4780                       # static route to a fixed port
 portless list                                      # show active routes
+portless autobahn node --watch server.mjs ~/code   # run by hand, auto-restart on edits
+portless alias autobahn 4780                       # static route to a fixed port instead
 ```
-
-Run `portless trust` once if the browser warns about the certificate.
 
 No portless? `--domain` (optionally `--domain=my.localhost`) binds port 80
 on loopback directly when it's free, for a plain-http portless URL:

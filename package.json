@@ -1,0 +1,10 @@
+{
+  "name": "autobahn-board",
+  "version": "0.1.0",
+  "description": "A kanban board that lives in your markdown",
+  "bin": { "autobahn": "./cli.mjs" },
+  "files": ["cli.mjs", "server.mjs", "index.html", "FORMAT.md"],
+  "engines": { "node": ">=18" },
+  "repository": "github:0xSMW/autobahn",
+  "license": "MIT"
+}
