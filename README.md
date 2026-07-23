@@ -1,5 +1,7 @@
 # Autobahn
 
+<img width="1164" height="642" alt="image" src="https://github.com/user-attachments/assets/608d4caa-983f-4b73-9511-f7394865ac79" />
+
 A kanban board that lives in your markdown. Zero dependencies, one file of
 server, one file of UI. Your `BACKLOG.md` stays the single source of truth.
 Autobahn renders it as lanes, and dragging a card rewrites the file,
@@ -14,6 +16,8 @@ database, no accounts, no sync. If you delete Autobahn tomorrow, your
 backlog loses nothing.
 
 ## Quickstart
+
+<img width="1164" height="642" alt="image" src="https://github.com/user-attachments/assets/c049e633-5ff8-4c7f-aee5-75dcacb82df0" />
 
 One command sets Autobahn up as a resident service: every repo under
 your code root gets a board at a stable, portless HTTPS URL.
