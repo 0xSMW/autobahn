@@ -7,13 +7,33 @@ server, one file of UI. Your `BACKLOG.md` stays the single source of truth.
 Autobahn renders it as lanes, and dragging a card rewrites the file,
 byte-for-byte. Commit as usual.
 
-## Why
-
 Markdown backlogs are great for working with agents and humans in the same
 file: greppable, diffable, reviewable, no lock-in. What they lack is a
-glanceable board. Autobahn is that board, nothing more. There is no
-database, no accounts, no sync. If you delete Autobahn tomorrow, your
-backlog loses nothing.
+glanceable board. Autobahn is that board, nothing more. No
+database, no accounts, no sync. 
+
+## What it does
+
+- **Lanes** — `## Now`, `## Next`, `## Later` headings in the backlog open
+  lanes. Every `## PREFIX-N · Title` block under them is a card.
+- **Drag to move** — between lanes, or onto a card to insert before it.
+  Both splice the card's markdown block into its new position and write the
+  file back.
+- **Shipped is derived** — cards whose Status starts with done / shipped /
+  resolved / retired (or whose title says so) collect in a Shipped column
+  automatically. No archiving ritual.
+- **New card** — mints the next id (`TASK-007`) and appends a template card.
+- **Card lightbox** — click any card for its full rendered body.
+- **Pinned notes** — non-card `##` blocks inside the first lane render as
+  pinned notes above the board (sprint goals, standing reminders).
+- **Docs tabs** — the rest of your project's markdown, rendered read-only.
+- **Live reload** — the server watches the board directory (OS file
+  events, no polling). Edit the markdown in your editor and the open board
+  refreshes itself.
+- **Dirty flag** — shows when the board file (and only the board file) has
+  uncommitted changes. Click it to preview a generated commit subject
+  ("backlog: TASK-007 carded · TASK-003 → Now"), click again to commit
+  just that file, never the rest of the repo.
 
 ## Quickstart
 
@@ -72,29 +92,6 @@ on loopback directly when it's free, for a plain-http portless URL:
 ```
 node server.mjs ~/code --domain     # → http://autobahn.localhost
 ```
-
-## What it does
-
-- **Lanes** — `## Now`, `## Next`, `## Later` headings in the backlog open
-  lanes. Every `## PREFIX-N · Title` block under them is a card.
-- **Drag to move** — between lanes, or onto a card to insert before it.
-  Both splice the card's markdown block into its new position and write the
-  file back.
-- **Shipped is derived** — cards whose Status starts with done / shipped /
-  resolved / retired (or whose title says so) collect in a Shipped column
-  automatically. No archiving ritual.
-- **New card** — mints the next id (`TASK-007`) and appends a template card.
-- **Card lightbox** — click any card for its full rendered body.
-- **Pinned notes** — non-card `##` blocks inside the first lane render as
-  pinned notes above the board (sprint goals, standing reminders).
-- **Docs tabs** — the rest of your project's markdown, rendered read-only.
-- **Live reload** — the server watches the board directory (OS file
-  events, no polling). Edit the markdown in your editor and the open board
-  refreshes itself.
-- **Dirty flag** — shows when the board file (and only the board file) has
-  uncommitted changes. Click it to preview a generated commit subject
-  ("backlog: TASK-007 carded · TASK-003 → Now"), click again to commit
-  just that file, never the rest of the repo.
 
 ## Configuration
 
