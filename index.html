@@ -71,11 +71,15 @@
   .doc p { margin: 0 0 12px; text-wrap: pretty; }
   .doc ul, .doc ol { margin: 0 0 12px; padding-left: 22px; }
   .doc li { margin: 3px 0; }
+  .doc li > ul, .doc li > ol { margin: 4px 0 6px; }
+  .doc input[type="checkbox"] { margin: 0 7px 0 0; accent-color: #969A9C; }
   .doc strong { font-weight: 400; color: #DEDEDE; }
   .doc em { font-style: normal; color: #DEDEDE; }
+  .doc del { color: #969A9C; }
   .doc code { font-family: var(--mono); font-size: 12.5px; background: #111212; border-radius: 4px; padding: 1.5px 6px; color: #C9CDCF; }
   .doc pre.code { font-family: var(--mono); font-size: 12.5px; line-height: 1.6; background: #0A0B0B; padding: 14px 16px; margin: 0 0 14px; overflow-x: auto; white-space: pre; color: #A9ADAF; }
   .doc pre.code code { background: none; padding: 0; }
+  .doc img { display: block; max-width: 100%; height: auto; margin: 0 0 14px; border-radius: 8px; }
   .doc a { color: #DEDEDE; text-decoration: underline; text-underline-offset: 2px; }
   .doc hr { border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 24px 0; }
   .doc blockquote { border-left: 2px solid #3B3D3D; margin: 0 0 12px; padding: 2px 0 2px 14px; color: #969A9C; }
@@ -100,6 +104,7 @@
   .lb-sec { margin: 0 0 16px; }
   .lb-lab { font-size: 12px; color: #3B3D3D; margin-bottom: 2px; }
   .lb-val { font-size: 14.5px; line-height: 1.6; color: #C9CDCF; text-wrap: pretty; }
+  .lb-val > :last-child { margin-bottom: 0; }
   .lb-val.tbd { color: #3B3D3D; }
   #lb-block input { width: 100%; font: 14.5px/1.6 var(--sans); color: #C9CDCF; background: none; border: 0; outline: 0; padding: 2px 0; }
   #lb-block input::placeholder { color: #3B3D3D; }
@@ -276,7 +281,15 @@ document.addEventListener('click', (e) => {
 })
 function setTab(t) { tab = t; renderTabs(); render() }
 
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;') }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;') }
+function escAttrFromEscaped(s) {
+  return String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+function safeUrl(s) {
+  const url = String(s).trim()
+  return /^(?:https?:|mailto:|#|\/(?!\/)|\.{0,2}\/)/i.test(url) ? url : '#'
+}
+function indentOf(s) { return s.replace(/\t/g, '    ').length }
 
 // Never all uppercase (the house rule). ALL-CAPS words render Title Case,
 // except card ids (PREFIX-123) and real acronyms, which stay themselves.
@@ -297,23 +310,62 @@ function deshout(s) {
   })
 }
 
-// A small markdown renderer: headings, lists, bold/italic/code, links,
-// fences, tables, blockquotes, rules. Trusted local files only.
+// A small markdown renderer for trusted local files. It keeps enough block
+// structure for real project docs and rich card fields without adding a
+// runtime dependency.
 function inline(s) {
   return esc(s)
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g,
+      (_, alt, url, title) => `<img src="${escAttrFromEscaped(safeUrl(url))}" alt="${escAttrFromEscaped(alt)}"${title ? ` title="${escAttrFromEscaped(title)}"` : ''} loading="lazy">`)
+    .replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g,
+      (_, label, url, title) => `<a href="${escAttrFromEscaped(safeUrl(url))}"${title ? ` title="${escAttrFromEscaped(title)}"` : ''} target="_blank" rel="noreferrer">${label}</a>`)
     .replace(/`([^`]+)`/g, (_, c) => '<code>' + c + '</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/~~([^~]+)~~/g, '<del>$1</del>')
     .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>')
 }
 function md(src) {
   const out = []
   const lines = src.split('\n')
-  let i = 0, list = null
-  const closeList = () => { if (list) { out.push(list === 'ul' ? '</ul>' : '</ol>'); list = null } }
+  let i = 0
+  const lists = []
+  const closeLists = (depth = 0) => {
+    while (lists.length > depth) {
+      const list = lists.pop()
+      if (list.itemOpen) out.push('</li>')
+      out.push(`</${list.type}>`)
+    }
+  }
+  const listItem = (line) => line.match(/^(\s*)([-+*]|\d+[.)])\s+(.*)$/)
+  const openListItem = (match) => {
+    const indent = indentOf(match[1])
+    const ordered = /^\d/.test(match[2])
+    const type = ordered ? 'ol' : 'ul'
+    while (lists.length && indent < lists[lists.length - 1].indent) closeLists(lists.length - 1)
+    if (lists.length && indent === lists[lists.length - 1].indent && lists[lists.length - 1].type !== type) {
+      closeLists(lists.length - 1)
+    }
+    if (!lists.length || indent > lists[lists.length - 1].indent) {
+      const start = ordered ? Number.parseInt(match[2], 10) : 1
+      out.push(type === 'ol' && start !== 1 ? `<ol start="${start}">` : `<${type}>`)
+      lists.push({ type, indent, itemOpen: false })
+    } else if (lists[lists.length - 1].itemOpen) {
+      out.push('</li>')
+      lists[lists.length - 1].itemOpen = false
+    }
+    let content = match[3]
+    let checkbox = ''
+    const task = content.match(/^\[([ xX])\]\s+(.*)$/)
+    if (task) {
+      checkbox = `<input type="checkbox" disabled${task[1].toLowerCase() === 'x' ? ' checked' : ''}>`
+      content = task[2]
+    }
+    out.push('<li>' + checkbox + inline(deshout(absorb(content))))
+    lists[lists.length - 1].itemOpen = true
+  }
   // A line that STARTS a block (vs. a hard-wrapped continuation of the
   // previous paragraph or list item — many md sources wrap at ~72 cols).
-  const isBlockStart = (l) => /^(#{1,4} |```|---\s*$|\*\*\*\s*$|\s*[-*] |\s*\d+\. |> |\|)/.test(l) || l.trim() === ''
+  const isBlockStart = (l) => /^(#{1,6} |```|~~~|---\s*$|\*\*\*\s*$|> |\|)/.test(l) || !!listItem(l) || l.trim() === ''
   // Absorb hard-wrapped continuation lines into one flowing string.
   const absorb = (first) => {
     let text = first
@@ -322,24 +374,31 @@ function md(src) {
   }
   while (i < lines.length) {
     const l = lines[i]
-    if (/^```/.test(l)) { // fence: verbatim, no deshout, no rewrap
-      closeList()
+    const fence = l.match(/^(```|~~~)\s*([^\s`]*)/)
+    if (fence) { // fence: verbatim, no deshout, no rewrap
+      closeLists()
       const buf = []
+      const marker = fence[1]
+      const lang = fence[2].replace(/[^A-Za-z0-9_-]/g, '')
       i++
-      while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++])
-      i++
-      out.push('<pre class="code">' + esc(buf.join('\n')) + '</pre>')
+      while (i < lines.length && !lines[i].startsWith(marker)) buf.push(lines[i++])
+      if (i < lines.length) i++
+      out.push(`<pre class="code"><code${lang ? ` class="language-${lang}"` : ''}>${esc(buf.join('\n'))}</code></pre>`)
       continue
     }
     const t = deshout(l)
     let m
-    if ((m = t.match(/^(#{1,4}) (.*)$/))) { closeList(); out.push(`<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`) }
-    else if (/^(---|\*\*\*)\s*$/.test(t)) { closeList(); out.push('<hr/>') }
-    else if ((m = t.match(/^\s*[-*] (.*)$/))) { if (list !== 'ul') { closeList(); out.push('<ul>'); list = 'ul' } out.push('<li>' + inline(deshout(absorb(m[1]))) + '</li>') }
-    else if ((m = t.match(/^\s*\d+\. (.*)$/))) { if (list !== 'ol') { closeList(); out.push('<ol>'); list = 'ol' } out.push('<li>' + inline(deshout(absorb(m[1]))) + '</li>') }
-    else if ((m = t.match(/^> ?(.*)$/))) { closeList(); out.push('<blockquote>' + inline(m[1]) + '</blockquote>') }
+    if ((m = t.match(/^(#{1,6}) (.*)$/))) { closeLists(); out.push(`<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`) }
+    else if (/^(---|\*\*\*)\s*$/.test(t)) { closeLists(); out.push('<hr/>') }
+    else if ((m = listItem(l))) { openListItem(m) }
+    else if ((m = l.match(/^> ?(.*)$/))) {
+      closeLists()
+      const quote = [m[1]]
+      while (i + 1 < lines.length && (m = lines[i + 1].match(/^> ?(.*)$/))) { i++; quote.push(m[1]) }
+      out.push('<blockquote>' + md(quote.join('\n')) + '</blockquote>')
+    }
     else if (/^\|/.test(t)) { // table run
-      closeList()
+      closeLists()
       const rows = []
       while (i < lines.length && /^\|/.test(lines[i])) { rows.push(deshout(lines[i])); i++ }
       const cells = (r) => r.replace(/^\||\|$/g, '').split('|').map(c => inline(c.trim()))
@@ -349,11 +408,11 @@ function md(src) {
         rest.map(r => '<tr>' + cells(r).map(c => `<td>${c}</td>`).join('') + '</tr>').join('') + '</table>')
       continue
     }
-    else if (t.trim() === '') { closeList() }
-    else { closeList(); out.push('<p>' + inline(deshout(absorb(l))) + '</p>') }
+    else if (t.trim() === '') { closeLists() }
+    else { closeLists(); out.push('<p>' + inline(deshout(absorb(l))) + '</p>') }
     i++
   }
-  closeList()
+  closeLists()
   return out.join('\n')
 }
 
@@ -468,8 +527,9 @@ document.getElementById('comp-tag-in').addEventListener('keydown', e => {
 
 // The leading run of `- **Field:** value` bullets is structured data, not
 // prose — pull it out so the lightbox can lay each field out properly.
-// Hard-wrapped values absorb their continuation lines; everything after the
-// field block stays markdown.
+// Continuation lines remain Markdown. Their field indentation is removed,
+// while relative indentation (such as nested lists) is preserved. Everything
+// after the leading field block stays Markdown.
 function parseFields(body) {
   const lines = body.split('\n')
   const fields = []
@@ -478,10 +538,21 @@ function parseFields(body) {
     if (lines[i].trim() === '' && fields.length) { i++; continue }
     const m = lines[i].match(/^\s*[-*] \*\*([^:*]+):\*\*\s*(.*)$/)
     if (!m) break
-    let val = m[2]
+    const fieldIndent = indentOf((lines[i].match(/^\s*/) || [''])[0])
+    const continuation = []
     i++
-    while (i < lines.length && lines[i].trim() && !/^\s*[-*] |^#{1,4} |^```|^> |^\|/.test(lines[i])) { val += ' ' + lines[i].trim(); i++ }
-    fields.push([m[1].trim(), val.replace(/\*/g, '').trim()])
+    while (i < lines.length) {
+      const nextField = lines[i].match(/^(\s*)[-*] \*\*([^:*]+):\*\*\s*(.*)$/)
+      if (nextField && indentOf(nextField[1]) <= fieldIndent) break
+      if (lines[i].trim() && indentOf((lines[i].match(/^\s*/) || [''])[0]) <= fieldIndent) break
+      continuation.push(lines[i])
+      i++
+    }
+    while (continuation.length && continuation[continuation.length - 1].trim() === '') continuation.pop()
+    const indents = continuation.filter(l => l.trim()).map(l => indentOf((l.match(/^\s*/) || [''])[0]))
+    const dedent = indents.length ? Math.min(...indents) : 0
+    const valueLines = [m[2], ...continuation.map(l => l.trim() ? l.slice(dedent) : '')]
+    fields.push([m[1].trim(), valueLines.join('\n').trim()])
   }
   return { fields, rest: lines.slice(i).join('\n') }
 }
@@ -512,7 +583,7 @@ function openCard(id) {
   renderBlock(item.id)
   const secs = fields.filter(([n]) => !HEADER_FIELDS.has(n.toLowerCase())).map(([n, v]) =>
     `<div class="lb-sec"><div class="lb-lab">${esc(deshout(n))}</div>` +
-    `<div class="lb-val${TBD_RE.test(v) ? ' tbd' : ''}">${TBD_RE.test(v) ? esc(v || 'tbd') : inline(deshout(v))}</div></div>`).join('')
+    `<div class="lb-val${TBD_RE.test(v) ? ' tbd' : ''}">${TBD_RE.test(v) ? esc(v || 'tbd') : md(v)}</div></div>`).join('')
   document.getElementById('lb-body').innerHTML = secs + (rest.trim() ? md(rest) : '')
   document.getElementById('lb-foot').innerHTML =
     `<span>${esc(state.backlog)}:${item.line}</span>` +

@@ -4,6 +4,7 @@
   "description": "A kanban board that lives in your markdown",
   "bin": { "autobahn": "./cli.mjs" },
   "files": ["cli.mjs", "server.mjs", "index.html", "FORMAT.md"],
+  "scripts": { "test": "node --test test/*.test.mjs" },
   "engines": { "node": ">=18" },
   "repository": "github:0xSMW/autobahn",
   "license": "MIT"

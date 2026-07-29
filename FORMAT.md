@@ -63,6 +63,23 @@ body content — visible in the lightbox, ignored by the board logic. The
 template minted by New card includes Why / Spec / Done means because we
 found cards without them rot; delete what you don't use.
 
+Field values may contain indented Markdown. Keep continuation lines indented
+beneath the field bullet; lists, nested lists, task lists, blockquotes, fenced
+code, tables, links, images, and ordinary hard-wrapped prose render in the
+field's lightbox section:
+
+````markdown
+- **Spec:** Ship these outcomes:
+  1. Preserve the document as stable context.
+  2. Make the next action obvious.
+     - [x] Cover the primary workflow.
+     - [ ] Cover recovery paths.
+
+  ```js
+  verifyWorkflow()
+  ```
+````
+
 ## Pinned notes
 
 A `##` heading inside the **first** lane that is *not* a card (no
